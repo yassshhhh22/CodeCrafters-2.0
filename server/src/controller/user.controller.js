@@ -3,37 +3,31 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { User } from "../model/user.model.js";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 const generateAccessAndRefreshtokens = async (userId) => {
   try {
-    // console.log("Generating tokens for user:", userId);
     const user = await User.findById(userId);
-
     if (!user) {
-      // console.error("User not found for ID:", userId);
       throw new ApiError(404, "User not found");
-    }
-
-    // console.log("User found:", user.username);
-
-    if (!user.generateAccessToken() || !user.generateRefreshToken()) {
-      // console.error("Token generation methods are missing in User model");
-      throw new ApiError(500, "Token generation methods missing");
     }
 
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    // console.log("Access Token:", accessToken);
-    // console.log("Refresh Token:", refreshToken);
-
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
-    // console.log("Tokens generated successfully!");
     return { accessToken, refreshToken };
   } catch (error) {
-    // console.error("Error in generateAccessAndRefreshtokens:", error);
     throw new ApiError(
       500,
       "Something went wrong while generating refresh access token"
@@ -42,21 +36,17 @@ const generateAccessAndRefreshtokens = async (userId) => {
 };
 
 export const loginUser = asynchandler(async (req, res) => {
-
   const { email, password } = req.body;
-  if (!email) {
-    throw new ApiError(400, "email is required");
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
   }
-  const user = await User.findOne({
-    email
-  });
 
+  const user = await User.findOne({ email });
   if (!user) {
     throw new ApiError(401, "Invalid email or password");
   }
 
   const isMatch = await user.comparePassword(password);
-
   if (!isMatch) {
     throw new ApiError(401, "Invalid password");
   }
@@ -67,11 +57,8 @@ export const loginUser = asynchandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshtokens(
     user._id
   );
-  const options = {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none'
-  };
+
+  const options = { httpOnly: true, secure: true, sameSite: "none" };
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
@@ -79,56 +66,82 @@ export const loginUser = asynchandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        {
-          user: loggedInUser
-        },
+        { user: loggedInUser },
         "User logged in successfully"
       )
     );
 });
 
-export const registerUser = asynchandler(async (req, res) => {
 
+export const registerUser = asynchandler(async (req, res) => {
   const { fullname, email, username, password } = req.body;
-  console.log(req.body);
 
   if (!fullname || !email || !username || !password || password.trim() === "") {
     throw new ApiError(400, "All fields are required");
   }
 
   const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-
   if (existingUser) {
     throw new ApiError(400, "User already exists");
   }
 
+  const otp = Math.floor(100000 + Math.random() * 900000);
 
-  const user = await User.create({
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Your OTP for Registration",
+    text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
+  });
+
+  await User.create({
     fullname,
     email,
     username,
-    password
+    password,
+    verifyCode: otp.toString(),
   });
-  const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
-  if (!createdUser) {
-    throw new ApiError(500, "Something went wrong while creating user");
-  }
+
   return res
     .status(201)
-    .json(new ApiResponse(201, createdUser, "User created successfully"));
+    .json(
+      new ApiResponse(
+        201,
+        {},
+        "User registered successfully. Verify OTP sent to your email to complete registration."
+      )
+    );
+});
+
+export const verifyOtp = asynchandler(async (req, res) => {
+  const { otp } = req.body;
+  const { email } = req.headers;
+  console.log(otp, email, req.headers);
+  if (!email || !otp) {
+    throw new ApiError(400, "Email and OTP are required");
+  }
+  console.log(otp);
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  console.log(user.verifyCode);
+
+  const code = otp.verifyCode;
+
+  if (code.toString() !== user.verifyCode.toString()) {
+    throw new ApiError(401, "Invalid OTP");
+  }
+  user.isVerified = true;
+  user.verifyCode = null;
+  await user.save();
+  return res.json(new ApiResponse(200, {}, "Email Verification Successful"));
 });
 
 export const logoutUser = asynchandler(async (req, res) => {
-
-  await User.findByIdAndUpdate(req.user._id, {
-    refreshToken: "",
-  });
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
+  await User.findByIdAndUpdate(req.user._id, { refreshToken: "" });
+  const options = { httpOnly: true, secure: true };
   return res
     .status(200)
     .clearCookie("accessToken", options)
@@ -136,13 +149,13 @@ export const logoutUser = asynchandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
-
 export const refreshAccessToken = asynchandler(async (req, res) => {
   const incomingRefreshToken =
     req.cookies.refreshToken || req.body.refreshToken;
   if (!incomingRefreshToken) {
     throw new ApiError(400, "Refresh token is required");
   }
+
   try {
     const decoded = jwt.verify(
       incomingRefreshToken,
@@ -152,13 +165,12 @@ export const refreshAccessToken = asynchandler(async (req, res) => {
     if (!user) {
       throw new ApiError(401, "Invalid refresh token");
     }
+
     const { accessToken, refreshToken } = await generateAccessAndRefreshtokens(
       user._id
     );
-    const options = {
-      httpOnly: true,
-      secure: true,
-    };
+
+    const options = { httpOnly: true, secure: true };
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
@@ -175,26 +187,30 @@ export const refreshAccessToken = asynchandler(async (req, res) => {
   }
 });
 
-
 export const changeCurrentPassword = asynchandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const user = await User.findById(req.user?._id);
+
   const ispasswordMatch = await user.comparePassword(oldPassword);
   if (!ispasswordMatch) {
     throw new ApiError(400, "Invalid password");
   }
+
   user.password = newPassword;
   await user.save({ validateBeforeSave: false });
+
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
+
 
 export const getCurrentUser = asynchandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, req.user, "User details fetched successfully"));
 });
+
 
 export const updateAccountDetails = asynchandler(async (req, res) => {
 
@@ -206,6 +222,7 @@ export const updateAccountDetails = asynchandler(async (req, res) => {
 
   const user = await User.findByIdAndUpdate(
     req.user._id, 
+    req.user._id,
     { fullname, email },
     { new: true }
   )
