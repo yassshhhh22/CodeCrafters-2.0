@@ -1,30 +1,18 @@
 import mongoose from "mongoose";
-import asynchandler from "express-async-handler";
 import dotenv from "dotenv";
+import { DB_name } from "../utils/constants.js";
 
-dotenv.config(); 
+dotenv.config();
 
-const connectDB = asynchandler(async () => {
-  
-//   console.log("MONGO_URI:", process.env.MONGO_URI);
 
-  if (!process.env.MONGO_URI) {
-    throw new Error("❌ MONGO_URI is not defined in .env file!");
-  }
-
+const DBconnect = async () => {
   try {
-    const connectionInstance = await mongoose.connect(
-      `${process.env.MONGO_URI}`,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
-    console.log(`✅ MongoDB Connected: ${connectionInstance.connection.host}`);
+    const connectionobj = await mongoose.connect(`${process.env.MONGO_URI}/${DB_name}`)
+    console.log("\n MongoDB Connected Successfully")
   } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+    console.log("Error in DBconnect::", error)
+    process.exit(1)
   }
-});
+}
 
-export default connectDB;
+export default DBconnect
