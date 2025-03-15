@@ -5,23 +5,20 @@ import jwt from "jsonwebtoken";
 const stocksSchema = new mongoose.Schema({
   user: {
     type: mongoose.Types.ObjectId,
-    ref: "User"
+    ref: "User",
   },
-  stock:{
+  stock: {
     name: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
-    Currentprice:{
-        type: String,
-        required: true,
-        trim: true
+    Currentprice: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    
-  }
+  },
 });
 
-
-
-export const User = mongoose.model("User", stocksSchema);
+export const Stocks = mongoose.model("Stocks", stocksSchema);

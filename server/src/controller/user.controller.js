@@ -72,7 +72,6 @@ export const loginUser = asynchandler(async (req, res) => {
     );
 });
 
-
 export const registerUser = asynchandler(async (req, res) => {
   const { fullname, email, username, password } = req.body;
 
@@ -204,16 +203,13 @@ export const changeCurrentPassword = asynchandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
-
 export const getCurrentUser = asynchandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, req.user, "User details fetched successfully"));
 });
 
-
 export const updateAccountDetails = asynchandler(async (req, res) => {
-
   const { fullname, email } = req.body;
 
   if (!req.user?._id) {
@@ -221,9 +217,8 @@ export const updateAccountDetails = asynchandler(async (req, res) => {
   }
 
   const user = await User.findByIdAndUpdate(
-    req.user._id, 
     req.user._id,
-    { fullname, email },
+    { fullname, email }, // Corrected update object
     { new: true }
   )
     .select("-password")
@@ -233,7 +228,3 @@ export const updateAccountDetails = asynchandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
-
-
-
-
