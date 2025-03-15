@@ -94,7 +94,7 @@ export const registerUser = asynchandler(async (req, res) => {
     text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
   });
 
-  await User.create({
+ const user = await User.create({
     fullname,
     email,
     username,
@@ -107,32 +107,32 @@ export const registerUser = asynchandler(async (req, res) => {
     .json(
       new ApiResponse(
         201,
-        {},
+        user,
         "User registered successfully. Verify OTP sent to your email to complete registration."
       )
     );
 });
 
 export const verifyOtp = asynchandler(async (req, res) => {
-  const { otp } = req.body;
-  const { email } = req.headers;
-  console.log(otp, email, req.headers);
+  const { otp, email } = req.body;
+  
+  console.log(otp, email);
   if (!email || !otp) {
     throw new ApiError(400, "Email and OTP are required");
   }
   console.log(otp);
-
-  const user = await User.findOne({ email });
+  
+  const user = await User.findOne({ email:email });
   if (!user) {
     throw new ApiError(404, "User not found");
   }
   console.log(user.verifyCode);
-
-  const code = otp.verifyCode;
-
-  if (code.toString() !== user.verifyCode.toString()) {
+  
+  // Fix here - directly compare otp with user.verifyCode
+  if (String(otp).trim() !== user.verifyCode) {
     throw new ApiError(401, "Invalid OTP");
   }
+  
   user.isVerified = true;
   user.verifyCode = null;
   await user.save();

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { data, useNavigate } from "react-router";
+import {  useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { EyeClosed, EyeIcon } from "lucide-react";
-import { AxiosInstance } from "../Utils/AxiosInstance";
-import { Link } from "react-router";
+import { RegisterUser } from "../Store/userSlice";
+import { useDispatch } from "react-redux";
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -18,12 +19,8 @@ const Register = () => {
     try {
       if (data) {
         console.log(data);
-        const response = await AxiosInstance.post("/v1/users/register", data);
-        console.log(response.data.message);
+       dispatch(RegisterUser(data)).unwrap();
         navigate(`/verify-email`);
-        if (!response) {
-          throw new Error("Error logging in", response.data.error);
-        }
       }
     } catch (error) {
       console.log(error);
