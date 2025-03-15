@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { EyeClosed, EyeIcon,UserCircle,User,Mail,Lock } from "lucide-react";
-import RegisterUser from "../Store/userSlice";
+import {RegisterUser} from "../Store/userSlice";
 import { useDispatch } from "react-redux";
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MoonIcon, SunIcon, LogInIcon, LogOutIcon} from "lucide-react";
+import { MoonIcon, SunIcon, LogInIcon, LogOutIcon, IndianRupee} from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { Link } from "react-router";
@@ -11,7 +11,7 @@ function Header() {
   const UserData = useSelector((state) => state.user.userData);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+  console.log(UserData)
   const [query, setQuery] = useState("");
   const [darkMode, setDarkMode] = useState(
     document.documentElement.classList.contains("dark")
@@ -39,6 +39,11 @@ function Header() {
       Status: !loginStatus,
       icon: <LogOutIcon className="h-6 w-6 text-white dark:text-black" />, 
     },
+    {
+      name: UserData?.user.amount,
+      Status: loginStatus,
+      icon: <IndianRupee className="h-6 w-6 text-white dark:text-black" />
+    }
   ];
 
   const logout = async () => {

@@ -2,6 +2,7 @@ import asynchandler from "express-async-handler";
 import { AxiosInstance } from "../utils/AxiosInstance.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 
+
 export const MarketTrendsApi = asynchandler(async (req, res) => {
   const { trend_type } = req.query;
   console.log(trend_type);
@@ -9,7 +10,7 @@ export const MarketTrendsApi = asynchandler(async (req, res) => {
     `https://real-time-finance-data.p.rapidapi.com/market-trends?trend_type=${trend_type}&country=in&language=en`,
     {
       headers: {
-        "x-rapidapi-key": "e73efbd959msh76019b42ac94269p1dc7cbjsnbc0475767cf6",
+        "x-rapidapi-key": "4e18a4c55fmsh64f106241d65966p11992fjsnc3891676e257",
         "x-rapidapi-host": "real-time-finance-data.p.rapidapi.com",
       },
     }

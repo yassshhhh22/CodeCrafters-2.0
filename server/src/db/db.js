@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-
+import { DB_name } from "../utils/constants.js";
 dotenv.config();
 
 const DBconnect = async () => {
   try {
-    const connectionobj = await mongoose.connect(process.env.MONGO_URI); // Removed /${DB_name}
+     await mongoose.connect(`${process.env.MONGO_URI}/${DB_name}`);
     console.log("\n MongoDB Connected Successfully");
   } catch (error) {
     console.log("Error in DBconnect::", error);

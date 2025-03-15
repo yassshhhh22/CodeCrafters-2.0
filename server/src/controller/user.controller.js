@@ -57,6 +57,9 @@ export const loginUser = asynchandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshtokens(
     user._id
   );
+  console.log(loggedInUser)
+  console.log(user)
+
 
   const options = { httpOnly: true, secure: true, sameSite: "none" };
   return res
@@ -90,7 +93,7 @@ export const registerUser = asynchandler(async (req, res) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Your OTP for Registration",
-    text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
+    text: `Your OTP is ${otp}. It will expire in 15 minutes.`,
   });
 
  const user = await User.create({
@@ -127,13 +130,11 @@ export const verifyOtp = asynchandler(async (req, res) => {
   }
   console.log(user.verifyCode);
   
-  // Fix here - directly compare otp with user.verifyCode
   if (String(otp).trim() !== user.verifyCode) {
     throw new ApiError(401, "Invalid OTP");
   }
   
   user.isVerified = true;
-  user.verifyCode = null;
   await user.save();
   return res.json(new ApiResponse(200, {}, "Email Verification Successful"));
 });
