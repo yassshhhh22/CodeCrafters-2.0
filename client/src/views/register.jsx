@@ -109,7 +109,7 @@ const Register = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="············"
+                placeholder="********"
                 className="outline-none border-none text-base text-black w-full"
                 style={{ paddingRight: "1rem", width: "100%" }}
                 {...register("password", {

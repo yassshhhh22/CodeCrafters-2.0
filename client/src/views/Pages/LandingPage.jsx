@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import { Link } from 'react-router';
 
 const LandingPage = () => {
     const [darkMode, setdarkMode] = useState(false)
@@ -12,7 +13,9 @@ const LandingPage = () => {
         <p className="text-lg bg-white dark:bg-black text-black dark:text-white mb-8 max-w-xl">
           Manage your portfolio, analyze performance, and stay on top of market trends with our powerful and intuitive platform.
         </p>
-        <button className="py-2 px-6 rounded-lg bg-black dark:bg-white text-white dark:text-black hover:dark:bg-gray-100 hover:bg-gray-900">Get Started</button>
+        <img src={darkMode ? "./candle.jpg" : "./candle_white.jpg"} alt="Candlestick Chart" className="mb-8 max-w-md w-full rounded-lg shadow-md" />
+        <Link to={'/signup'}>
+        <button className="py-2 px-6 rounded-lg bg-black dark:bg-white text-white dark:text-black hover:dark:bg-gray-100 hover:bg-gray-900">Get Started</button></Link>
       </section>
 
       {/* Features Section */}

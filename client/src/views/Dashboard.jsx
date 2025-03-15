@@ -3,14 +3,11 @@ import React from 'react'
 const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
-      {/* Top Nav */}
       <header className="flex items-center justify-between bg-white border-b px-4 py-2">
         <div className="flex items-center space-x-4">
-          {/* Logo placeholder */}
           <div className="text-green-600 font-bold text-xl">
             <span className="bg-green-100 p-1 rounded">S</span>tox
           </div>
-          {/* Sensex & Nifty Info */}
           <div className="flex items-center space-x-4 text-sm text-gray-600">
             <div>
               SENSEX <span className="text-red-500">73,828.91</span>{" "}
@@ -22,7 +19,6 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        {/* Right side user info placeholder */}
         <div className="text-sm font-medium">
           <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded">
             AP
@@ -31,9 +27,7 @@ const Dashboard = () => {
       </header>
 
       <div className="flex flex-1">
-        {/* Sidebar */}
         <aside className="w-60 bg-white border-r overflow-y-auto">
-          {/* Search */}
           <div className="p-3">
             <input
               type="text"
@@ -41,7 +35,6 @@ const Dashboard = () => {
               className="w-full border rounded px-2 py-1 text-sm"
             />
           </div>
-          {/* Stock List */}
           <ul className="space-y-1 text-sm">
             {[
               { name: "YESBANK NSE", price: "16.19", change: "+0.04 (+0.25%)" },
