@@ -6,6 +6,7 @@ import Login from './views/login.jsx'
 import Register from './views/register.jsx'
 import App from './App.jsx'
 import VerifyOtp from './views/verifyotp-page.jsx'
+import Dashboard from './views/Dashboard.jsx'
 
 const router = createBrowserRouter([
   {
@@ -14,7 +15,7 @@ const router = createBrowserRouter([
     children:[
       {
         element: <Login/>,
-        path: "/login"
+        path: "/signin"
       },
       {
         element: <Register/>,
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
         element: <VerifyOtp/>,
         path: "/verify-email"
       },
+      {
+        element: <Dashboard/>,
+        path: "/dashboard"
+      }
     ]
 
   }

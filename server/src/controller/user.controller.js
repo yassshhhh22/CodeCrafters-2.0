@@ -86,6 +86,7 @@ export const loginUser = asynchandler(async (req, res) => {
       )
     );
 });
+
 export const registerUser = asynchandler(async (req, res) => {
 
   const { fullname, email, username, password } = req.body;
@@ -188,13 +189,14 @@ export const changeCurrentPassword = asynchandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
+
 export const getCurrentUser = asynchandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, req.user, "User details fetched successfully"));
 });
+
 export const updateAccountDetails = asynchandler(async (req, res) => {
-  // console.log("User from request:", req.user); // Debugging
 
   const { fullname, email } = req.body;
 
@@ -203,7 +205,7 @@ export const updateAccountDetails = asynchandler(async (req, res) => {
   }
 
   const user = await User.findByIdAndUpdate(
-    req.user._id, // Make sure this exists
+    req.user._id, 
     { fullname, email },
     { new: true }
   )
@@ -214,5 +216,7 @@ export const updateAccountDetails = asynchandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
+
+
 
 
