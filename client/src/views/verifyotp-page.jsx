@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { AxiosInstance } from "../Utils/AxiosInstance.js";
 import { ApiError } from "../../../server/src/utils/apiError";
 import { useNavigate, useParams } from "react-router";
+import {useSelector} from "react-redux";
 const VerifyOtp = () => {
   const {
     register,
@@ -10,25 +11,25 @@ const VerifyOtp = () => {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
+  const userData = useSelector((state) => state.user.userData);  
   const handleEmailVerification = async (data) => {
     try {
       const response = await AxiosInstance.post(
         "/v1/users/verify-otp",
         {
-          otp: data,
-        },
-        {
-          headers: {
-            email: email,
-          },
+          otp: data.verifyCode,
+          email: userData.email,
         }
       );
-      if (response.data.status !== 200) {
+      console.log(response)
+      if (response.data.statusCode !== 200) {
         throw new ApiError(500, "Email Verification Failed");
       }
       console.log("Email Verified");
       navigate("/dashboard");
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (

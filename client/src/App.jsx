@@ -6,12 +6,18 @@ import Login from './views/login.jsx'
 import Register from './views/register.jsx'
 import VerifyOtpPage from './views/verifyotp-page.jsx'
 import { Outlet } from 'react-router'
+import Header from './Components/Common/Header.jsx'
+import Footer from './Components/Common/Footer.jsx'
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-     <Outlet/>
+      <Header />
+      <main>
+        <Outlet />
+      </main>
+      <Footer />
     </>
   )
 }
