@@ -10,10 +10,14 @@ const stockTransactionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  stockname: {
+    type: String,
+    required: true,
+  },
   transactionType: {
     type: String,
     enum: ["buy", "sell"],
-    required: true,
+    default: "",
   },
   quantity: {
     type: Number,

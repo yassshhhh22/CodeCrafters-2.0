@@ -2,10 +2,11 @@ import StockTransaction from "../model/stockTransaction.model.js";
 
 export const buyStock = async (req, res) => {
   try {
-    const { userId, stockSymbol, quantity, price } = req.body;
+    const { userId, stockSymbol,stockname, quantity, price } = req.body;
     const transaction = await StockTransaction.create({
       userId,
       stockSymbol,
+      stockname,
       transactionType: "buy",
       quantity,
       price,
@@ -18,10 +19,11 @@ export const buyStock = async (req, res) => {
 
 export const sellStock = async (req, res) => {
   try {
-    const { userId, stockSymbol, quantity, price } = req.body;
+    const { userId, stockSymbol,stockname, quantity, price } = req.body;
     const transaction = await StockTransaction.create({
       userId,
       stockSymbol,
+      stockname,
       transactionType: "sell",
       quantity,
       price,
