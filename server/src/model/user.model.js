@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema({
   refreshToken: {
     type: String,
   },
+  verifyCode : {
+    type: String,
+    minLength : 6
+  }
+  ,
   isVerified : {
     type : Boolean,
     default : false
