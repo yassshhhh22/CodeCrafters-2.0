@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AxiosInstance } from '../Utils/AxiosInstance';
 import { ApiError } from '../../../server/src/utils/apiError';
 import { Loader, Triangle } from 'lucide-react';
+import { BuyStocks } from '../Functions/BuyStocks';
 import { Search, Plus, PieChart, BarChart3, TrendingUp, Newspaper ,X} from 'lucide-react';
 const Dashboard = () => {
   const [stocks, setStocks] = useState([]);
