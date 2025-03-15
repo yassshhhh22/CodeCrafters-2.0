@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 
 export const MarketTrendsApi = asynchandler(async (req, res) => {
   const { trend_type } = req.query;
-
+  console.log(trend_type);
   const response = await AxiosInstance.get(
     `https://real-time-finance-data.p.rapidapi.com/market-trends?trend_type=${trend_type}&country=in&language=en`,
     {
@@ -13,6 +13,8 @@ export const MarketTrendsApi = asynchandler(async (req, res) => {
         "x-rapidapi-host": "real-time-finance-data.p.rapidapi.com",
       },
     }
+  );
+  console.log(response
   );
 
   if (response.data.status !== "OK") {
