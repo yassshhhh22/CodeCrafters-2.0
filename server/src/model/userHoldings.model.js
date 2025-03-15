@@ -5,13 +5,12 @@ import jwt from "jsonwebtoken";
 const userHoldingSchema = new mongoose.Schema({
   user: {
     type: mongoose.Types.ObjectId,
-    ref: "User"
+    ref: "User",
   },
-  holdings:{
+  holdings: {
     type: mongoose.Types.ObjectId,
-    ref: "Stocks"
-  }
+    ref: "Stocks",
+  },
 });
 
-
-export const User = mongoose.model("User", userHoldingSchema);
+export const UserHoldings = mongoose.model("UserHoldings", userHoldingSchema);

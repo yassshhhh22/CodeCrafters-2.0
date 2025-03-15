@@ -2,6 +2,8 @@ import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
 import {router as ApiRouter} from "./route/api.routes.js"
+import userInvestmentRouter from "./route/userInvestment.routes.js";
+
 
 const app = express()
 
@@ -23,5 +25,6 @@ import userRouter from './route/user.route.js'
 app.use("/v1/healthcheck", healthcheckRouter)
 app.use("/v1/users", userRouter)
 app.use("/v1/api", ApiRouter)
+app.use("/v1/investments", userInvestmentRouter);
 
 export default app
