@@ -1,6 +1,6 @@
 import asynchandler from "express-async-handler"
-import { AxiosInstance } from "../utils/AxiosInstance";
-import { ApiResponse } from "../utils/apiResponse";
+import { AxiosInstance } from "../utils/AxiosInstance.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 
 const MarketTrendsApi = asynchandler(
     async (req, res) => {

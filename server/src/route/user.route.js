@@ -8,15 +8,15 @@ import {
   updateAccountDetails,
   getCurrentUser,
 } from "../controller/user.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { AuthMiddleware } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 router.route("/login").post(loginUser);
 router.route("/register").post(registerUser);
-router.route("/logout").post(verifyJWT, logoutUser);
+router.route("/logout").post(AuthMiddleware, logoutUser);
 router.route("/refresh-access-token").post(refreshAccessToken);
-router.route("/change-password").post(verifyJWT, changeCurrentPassword);
-router.route("/current-user").get(verifyJWT, getCurrentUser);
-router.route("/update-account").patch(verifyJWT, updateAccountDetails);
+router.route("/change-password").post(AuthMiddleware, changeCurrentPassword);
+router.route("/current-user").get(AuthMiddleware, getCurrentUser);
+router.route("/update-account").patch(AuthMiddleware, updateAccountDetails);
 export default router;
