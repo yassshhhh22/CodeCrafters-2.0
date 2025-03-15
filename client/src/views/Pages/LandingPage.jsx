@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState } from 'react';
-import { MoonIcon,SunIcon } from 'lucide-react';
 
 const LandingPage = () => {
     const [darkMode, setdarkMode] = useState(false)
