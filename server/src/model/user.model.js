@@ -24,20 +24,6 @@ const userSchema = new mongoose.Schema({
     trim: true,
     index: true,
   },
-  avatar: {
-    type: String,
-    default: "", // ✅ Allow users to register without an avatar
-  },
-  coverImage: {
-    type: String,
-    default: "", // ✅ Allow users to register without a cover image
-  },
-  watchHistory: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Video",
-    },
-  ],
   password: {
     type: String,
     required: [true, "Password is required"],
@@ -47,14 +33,12 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// 🔹 Hash password before saving
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next(); // ✅ Prevent double execution
+  if (!this.isModified("password")) return next(); 
   this.password = await bcrypt.hash(this.password, 8);
   next();
 });
 
-// 🔹 Compare passwords
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
@@ -70,17 +54,16 @@ userSchema.methods.generateAccessToken = function () {
       fullname: this.fullname,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1h" } // ✅ Default expiry to 1 hour if missing
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1h" }
   );
 };
 
-// 🔹 Generate refresh token
 userSchema.methods.generateRefreshToken = function () {
   if (!process.env.REFRESH_TOKEN_SECRET) throw new Error("Missing REFRESH_TOKEN_SECRET");
   return jwt.sign(
     { id: this._id },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "7d" } // ✅ Default expiry to 7 days if missing
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "7d" }
   );
 };
 
