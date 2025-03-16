@@ -54,7 +54,6 @@ const EquityDashboard = () => {
       console.error("API Error:", err);
       setError("Failed to fetch equity portfolio data");
 
-      // Fallback data for development/demo
       setEquityData({
         performance: [
           { name: "Jan", value: 4000 },
@@ -141,14 +140,11 @@ const EquityDashboard = () => {
 
     const ws = new WebSocket("ws://localhost:8080");
     ws.onmessage = (event) => {
-      // Handle WebSocket messages if needed
       console.log("WebSocket message:", event.data);
     };
 
-    // Cleanup on unmount
     return () => {
       if (ws.readyState === WebSocket.OPEN) {
-        // Ensure WebSocket is open before closing
         ws.close();
       }
     };
@@ -178,6 +174,23 @@ const EquityDashboard = () => {
     "#FF8042",
   ];
 
+  // Custom dark mode tooltip for charts
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded shadow-lg text-slate-800 dark:text-slate-200 text-sm">
+          <p className="font-medium">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} style={{ color: entry.color }}>
+              {entry.name}: {entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   const SkeletonLoader = () => (
     <div className="animate-pulse">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -191,10 +204,12 @@ const EquityDashboard = () => {
   );
 
   return (
-    <div className="w-full">
+    <div className="w-full text-slate-800 dark:text-slate-200 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
       {/* Main content */}
       {error ? (
-        <div className="text-center text-red-500 font-medium">{error}</div>
+        <div className="text-center text-red-500 dark:text-red-400 font-medium p-8 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/30">
+          {error}
+        </div>
       ) : loading ? (
         <SkeletonLoader />
       ) : (
@@ -204,15 +219,15 @@ const EquityDashboard = () => {
               Equity Portfolio
             </h1>
             <div className="flex space-x-2">
-              <button className="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-md transition-colors text-sm">
+              <button className="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-md transition-colors text-sm dark:text-slate-200">
                 <RefreshCw className="h-4 w-4" />
                 <span>Refresh</span>
               </button>
-              <button className="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-md transition-colors text-sm">
+              <button className="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-md transition-colors text-sm dark:text-slate-200">
                 <Filter className="h-4 w-4" />
                 <span>Filter</span>
               </button>
-              <button className="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-md transition-colors text-sm">
+              <button className="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-md transition-colors text-sm dark:text-slate-200">
                 <Download className="h-4 w-4" />
                 <span>Export</span>
               </button>
@@ -221,35 +236,35 @@ const EquityDashboard = () => {
 
           {/* Summary Cards - Similar to your overview dashboard */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div className="p-5 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-center transition-all hover:shadow-md">
+            <div className="p-5  rounded-lg shadow-sm border p-3 border border-slate-100 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-center  transition-all hover:shadow-md">
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 Total Market Value
               </div>
-              <div className="text-xl font-semibold mt-1">
+              <div className="text-xl font-semibold mt-1 dark:text-white">
                 {formatCurrency(equityData.marketStats.totalValue / 100000)}L
               </div>
             </div>
-            <div className="p-5 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-center transition-all hover:shadow-md">
+            <div className="p-5  rounded-lg shadow-sm border p-3 border border-slate-100 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-center  transition-all hover:shadow-md">
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 Unrealized Gain/Loss
               </div>
-              <div className="text-xl font-semibold text-emerald-500 mt-1">
+              <div className="text-xl font-semibold text-emerald-500 dark:text-emerald-400 mt-1">
                 ₹{(equityData.marketStats.unrealizedGain / 100000).toFixed(2)}L
               </div>
             </div>
-            <div className="p-5 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-center transition-all hover:shadow-md">
+            <div className="p-5  rounded-lg shadow-sm border p-3 border border-slate-100 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-center  transition-all hover:shadow-md">
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 Dividend Yield
               </div>
-              <div className="text-xl font-semibold mt-1">
+              <div className="text-xl font-semibold mt-1 dark:text-white">
                 {equityData.marketStats.dividendYield}%
               </div>
             </div>
-            <div className="p-5 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-center transition-all hover:shadow-md">
+            <div className="p-5  rounded-lg shadow-sm border p-3 border border-slate-100 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-center  transition-all hover:shadow-md">
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 Sharpe Ratio
               </div>
-              <div className="text-xl font-semibold mt-1">
+              <div className="text-xl font-semibold mt-1 dark:text-white">
                 {equityData.marketStats.sharpeRatio}
               </div>
             </div>
@@ -258,7 +273,9 @@ const EquityDashboard = () => {
           {/* Top Holdings */}
           <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 mb-6">
             <div className="flex justify-between items-center p-5 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="font-semibold text-lg">Top Holdings</h2>
+              <h2 className="font-semibold text-lg dark:text-white">
+                Top Holdings
+              </h2>
               <button className="text-sm px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors">
                 View All
               </button>
@@ -305,23 +322,23 @@ const EquityDashboard = () => {
                       key={index}
                       className="hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap font-medium dark:text-white">
                         {holding.name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap dark:text-slate-300">
                         {holding.ticker}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <td className="px-6 py-4 whitespace-nowrap text-right dark:text-slate-300">
                         {holding.allocation}%
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <td className="px-6 py-4 whitespace-nowrap text-right dark:text-slate-300">
                         {formatCurrency(holding.price)}
                       </td>
                       <td
                         className={`px-6 py-4 whitespace-nowrap text-right font-medium ${
                           holding.change >= 0
-                            ? "text-emerald-500"
-                            : "text-red-500"
+                            ? "text-emerald-500 dark:text-emerald-400"
+                            : "text-red-500 dark:text-red-400"
                         }`}
                       >
                         <div className="flex items-center justify-end space-x-1">
@@ -344,24 +361,32 @@ const EquityDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {/* Portfolio Performance */}
             <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 p-5">
-              <h3 className="font-semibold mb-4 flex items-center">
-                <TrendingUp className="h-4 w-4 mr-2 text-emerald-500" />
+              <h3 className="font-semibold mb-4 flex items-center dark:text-white">
+                <TrendingUp className="h-4 w-4 mr-2 text-emerald-500 dark:text-emerald-400" />
                 Performance
               </h3>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={equityData.performance}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#e2e8f0"
+                      strokeOpacity={0.4}
+                    />
+                    <XAxis
+                      dataKey="name"
+                      stroke="#94a3b8"
+                      tick={{ fill: "#94a3b8" }}
+                    />
+                    <YAxis stroke="#94a3b8" tick={{ fill: "#94a3b8" }} />
+                    <Tooltip content={<CustomTooltip />} />
                     <Line
                       type="monotone"
                       dataKey="value"
                       stroke="#10b981"
                       strokeWidth={2}
                       dot={false}
-                      activeDot={{ r: 6 }}
+                      activeDot={{ r: 6, fill: "#10b981", stroke: "#fff" }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -370,14 +395,14 @@ const EquityDashboard = () => {
 
             {/* Sector Allocation */}
             <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 p-5">
-              <h3 className="font-semibold mb-4 flex items-center">
-                <PieChart className="h-4 w-4 mr-2 text-emerald-500" />
+              <h3 className="font-semibold mb-4 flex items-center dark:text-white">
+                <PieChart className="h-4 w-4 mr-2 text-emerald-500 dark:text-emerald-400" />
                 Sector Allocation
               </h3>
               <div className="mt-4 space-y-3">
                 {equityData.sectorAllocation.map((sector, index) => (
                   <div key={index} className="mt-4">
-                    <div className="flex justify-between text-sm font-medium mb-1.5">
+                    <div className="flex justify-between text-sm font-medium mb-1.5 dark:text-slate-300">
                       <span>{sector.name}</span>
                       <span>{sector.value}%</span>
                     </div>
@@ -397,8 +422,8 @@ const EquityDashboard = () => {
 
             {/* Risk Metrics */}
             <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 p-5">
-              <h3 className="font-semibold mb-4 flex items-center">
-                <BarChart3 className="h-4 w-4 mr-2 text-emerald-500" />
+              <h3 className="font-semibold mb-4 flex items-center dark:text-white">
+                <BarChart3 className="h-4 w-4 mr-2 text-emerald-500 dark:text-emerald-400" />
                 Risk Metrics
               </h3>
               <div className="space-y-4">
@@ -406,13 +431,15 @@ const EquityDashboard = () => {
                   <span className="text-slate-600 dark:text-slate-400">
                     Alpha (3Y)
                   </span>
-                  <span className="font-medium text-emerald-500">+2.34</span>
+                  <span className="font-medium text-emerald-500 dark:text-emerald-400">
+                    +2.34
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600 dark:text-slate-400">
                     Beta
                   </span>
-                  <span className="font-medium">
+                  <span className="font-medium dark:text-white">
                     {equityData.marketStats.beta}
                   </span>
                 </div>
@@ -420,19 +447,19 @@ const EquityDashboard = () => {
                   <span className="text-slate-600 dark:text-slate-400">
                     Standard Deviation
                   </span>
-                  <span className="font-medium">19.2%</span>
+                  <span className="font-medium dark:text-white">19.2%</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600 dark:text-slate-400">
                     Tracking Error
                   </span>
-                  <span className="font-medium">4.8%</span>
+                  <span className="font-medium dark:text-white">4.8%</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600 dark:text-slate-400">
                     Information Ratio
                   </span>
-                  <span className="font-medium">0.62</span>
+                  <span className="font-medium dark:text-white">0.62</span>
                 </div>
               </div>
             </div>
@@ -449,7 +476,7 @@ const EquityDashboard = () => {
                   className={`px-3 py-1 text-sm rounded-md transition-colors ${
                     activeTimeframe === "1M"
                       ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100"
-                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600"
+                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200"
                   }`}
                   onClick={() => setActiveTimeframe("1M")}
                 >
@@ -459,7 +486,7 @@ const EquityDashboard = () => {
                   className={`px-3 py-1 text-sm rounded-md transition-colors ${
                     activeTimeframe === "3M"
                       ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100"
-                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600"
+                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200"
                   }`}
                   onClick={() => setActiveTimeframe("3M")}
                 >
@@ -469,7 +496,7 @@ const EquityDashboard = () => {
                   className={`px-3 py-1 text-sm rounded-md transition-colors ${
                     activeTimeframe === "6M"
                       ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100"
-                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600"
+                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200"
                   }`}
                   onClick={() => setActiveTimeframe("6M")}
                 >
@@ -479,7 +506,7 @@ const EquityDashboard = () => {
                   className={`px-3 py-1 text-sm rounded-md transition-colors ${
                     activeTimeframe === "1Y"
                       ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100"
-                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600"
+                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200"
                   }`}
                   onClick={() => setActiveTimeframe("1Y")}
                 >
@@ -489,7 +516,7 @@ const EquityDashboard = () => {
                   className={`px-3 py-1 text-sm rounded-md transition-colors ${
                     activeTimeframe === "5Y"
                       ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100"
-                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600"
+                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200"
                   }`}
                   onClick={() => setActiveTimeframe("5Y")}
                 >
@@ -501,11 +528,23 @@ const EquityDashboard = () => {
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={equityData.historicalReturns}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#e2e8f0"
+                      strokeOpacity={0.4}
+                    />
+                    <XAxis
+                      dataKey="name"
+                      stroke="#94a3b8"
+                      tick={{ fill: "#94a3b8" }}
+                    />
+                    <YAxis stroke="#94a3b8" tick={{ fill: "#94a3b8" }} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend
+                      wrapperStyle={{
+                        color: "#94a3b8",
+                      }}
+                    />
                     <Bar dataKey="value" name="Return" fill="#10b981" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -515,19 +554,27 @@ const EquityDashboard = () => {
 
           {/* Equity Comparison */}
           <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 p-5 mb-6">
-            <h3 className="font-semibold mb-4">Performance vs Benchmark</h3>
+            <h3 className="font-semibold mb-4 dark:text-white">
+              Performance vs Benchmark
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="p-3 border border-slate-100 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800">
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   YTD Return
                 </p>
                 <div className="flex justify-between items-center mt-1">
-                  <span className="font-medium">Your Portfolio</span>
-                  <span className="font-medium text-emerald-500">+12.4%</span>
+                  <span className="font-medium dark:text-white">
+                    Your Portfolio
+                  </span>
+                  <span className="font-medium text-emerald-500 dark:text-emerald-400">
+                    +12.4%
+                  </span>
                 </div>
                 <div className="flex justify-between items-center mt-1">
-                  <span className="font-medium">NIFTY 50</span>
-                  <span className="font-medium text-emerald-500">+8.7%</span>
+                  <span className="font-medium dark:text-white">NIFTY 50</span>
+                  <span className="font-medium text-emerald-500 dark:text-emerald-400">
+                    +8.7%
+                  </span>
                 </div>
               </div>
               <div className="p-3 border border-slate-100 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800">
@@ -535,12 +582,18 @@ const EquityDashboard = () => {
                   1 Year Return
                 </p>
                 <div className="flex justify-between items-center mt-1">
-                  <span className="font-medium">Your Portfolio</span>
-                  <span className="font-medium text-emerald-500">+18.7%</span>
+                  <span className="font-medium dark:text-white">
+                    Your Portfolio
+                  </span>
+                  <span className="font-medium text-emerald-500 dark:text-emerald-400">
+                    +18.7%
+                  </span>
                 </div>
                 <div className="flex justify-between items-center mt-1">
-                  <span className="font-medium">NIFTY 50</span>
-                  <span className="font-medium text-emerald-500">+15.2%</span>
+                  <span className="font-medium dark:text-white">NIFTY 50</span>
+                  <span className="font-medium text-emerald-500 dark:text-emerald-400">
+                    +15.2%
+                  </span>
                 </div>
               </div>
               <div className="p-3 border border-slate-100 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800">
@@ -548,12 +601,18 @@ const EquityDashboard = () => {
                   3 Year Return
                 </p>
                 <div className="flex justify-between items-center mt-1">
-                  <span className="font-medium">Your Portfolio</span>
-                  <span className="font-medium text-emerald-500">+64.3%</span>
+                  <span className="font-medium dark:text-white">
+                    Your Portfolio
+                  </span>
+                  <span className="font-medium text-emerald-500 dark:text-emerald-400">
+                    +64.3%
+                  </span>
                 </div>
                 <div className="flex justify-between items-center mt-1">
-                  <span className="font-medium">NIFTY 50</span>
-                  <span className="font-medium text-emerald-500">+48.6%</span>
+                  <span className="font-medium dark:text-white">NIFTY 50</span>
+                  <span className="font-medium text-emerald-500 dark:text-emerald-400">
+                    +48.6%
+                  </span>
                 </div>
               </div>
             </div>

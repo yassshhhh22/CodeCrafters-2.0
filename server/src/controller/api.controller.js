@@ -10,7 +10,7 @@ export const MarketTrendsApi = asynchandler(async (req, res) => {
     `https://real-time-finance-data.p.rapidapi.com/market-trends?trend_type=${trend_type}&country=in&language=en`,
     {
       headers: {
-        "x-rapidapi-key": "4e18a4c55fmsh64f106241d65966p11992fjsnc3891676e257",
+        "x-rapidapi-key": "513b5a468fmsh4cde958b8fa5d06p120bfajsnbd5c09689329",
         "x-rapidapi-host": "real-time-finance-data.p.rapidapi.com",
       },
     }
