@@ -37,7 +37,7 @@ const UserLogin = createAsyncThunk("user_login", async (data, { rejectWithValue 
 
 const GetCurrentUser = createAsyncThunk("get_user", async (data, { rejectWithValue }) => {
     try {
-        const UserResponse = await AxiosInstance.get("/v1//users/current-user")
+        const UserResponse = await AxiosInstance.get("/v1/users/current-user")
         return UserResponse.data
     } catch (error) {
         return rejectWithValue(error.response.data)

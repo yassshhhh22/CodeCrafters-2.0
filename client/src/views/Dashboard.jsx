@@ -5,12 +5,14 @@ import { Loader, Triangle } from 'lucide-react';
 import { BuyStocks } from '../Functions/BuyStocks';
 import EquityDashboard from './EquityDashboard'; // Import the new component
 import { Search, Plus, PieChart, BarChart3, TrendingUp, Newspaper ,X} from 'lucide-react';
+import {useDispatch} from 'react-redux'
+import {toast} from 'react-toastify'
+import {useForm} from 'react-hook-form'
 
+import { GetCurrentUser } from '../Store/userSlice';
 
-
-// Call the function
-fetchPortfolioData();
 const Dashboard = () => {
+  const dispatch = useDispatch();
   const [stocks, setStocks] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -33,6 +35,12 @@ const Dashboard = () => {
       return null;
     }
   };
+  const [userInvestments, setUserInvestments] = useState({
+    monthlyData: [], // Initialize with empty array
+    portfolio: [],
+    summary: []
+  });
+  const {handleSubmit} = useForm()
   const fetchStocks = async () => {
     try {
       setLoading(true);
@@ -48,13 +56,53 @@ const Dashboard = () => {
     }
   };
 
+  const BuySellStocks = async ()=>{
+    try {
+        const response = await AxiosInstance.post("/v1/stocks/trade", {
+          stockname: selectedStock.name,
+          quantity,
+          stockSymbol: selectedStock.symbol,
+          price,
+          totalAmount,
+          transactionType: modalType,
+          transactionDate: new Date().toISOString()
+        })
+        if(response.status !== 201){
+            throw new ApiError(response.data.error)
+        }
+        toast.success(response.data.message,{
+          position: "bottom-right"
+        })
+        dispatch(GetCurrentUser()).unwrap()
+        console.log(response.data)
+    } catch (error) {
+      toast.error(error.message)
+        console.log(error)
+    }
+}
+
+  const getUserInvestments = async () => {
+    try {
+      setLoading(true);
+      const response = await AxiosInstance.get("/v1/stocks/investments");
+      console.log(response.data);
+      setUserInvestments(response.data);
+      console.log(userInvestments?.monthlyData[0]?.totalInvested)
+    } catch (error) {
+      console.error("API Error:", error);
+      setError("Failed to fetch user investments");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     fetchStocks();
-
+    getUserInvestments()
     const ws = new WebSocket('ws://localhost:8080');
 
     
-  }, []);
+  }, [Object.keys(userInvestments).length]);
 
   useEffect(() => {
     setTotalAmount(quantity * price);
@@ -76,20 +124,7 @@ const Dashboard = () => {
     setPrice(0);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(`${modalType.toUpperCase()} Order:`, {
-      stock: selectedStock.name,
-      quantity,
-      price,
-      totalAmount,
-      type: modalType
-    });
-    
-    handleCloseModal();
-    
-    alert(`${modalType.charAt(0).toUpperCase() + modalType.slice(1)} order placed successfully!`);
-  }
+  
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col transition-colors duration-200">
@@ -178,7 +213,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <div className="p-5 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-center transition-all hover:shadow-md">
             <div className="text-sm text-slate-500 dark:text-slate-400">Invested Amount</div>
-            <div className="text-xl font-semibold mt-1">₹29.00</div>
+            <div className="text-xl font-semibold mt-1">₹{userInvestments?.monthlyData[0]?.totalInvested}</div>
           </div>
           <div className="p-5 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-center transition-all hover:shadow-md">
             <div className="text-sm text-slate-500 dark:text-slate-400">Current Value</div>
@@ -211,54 +246,20 @@ const Dashboard = () => {
               <thead className="bg-slate-50 dark:bg-slate-800/50">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Stock Name</th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Quantity</th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Avg. Price</th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">LTP</th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Buy Quantity</th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sell Quantity</th>
+
                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Inv. Amt</th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mkt. Val</th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Overall G/L</th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Day's G/L</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700">
-                {[
-                  {
-                    name: "ALSTONE",
-                    quantity: 15,
-                    avgPrice: 0.75,
-                    ltp: 0.60,
-                    invAmt: 11.25,
-                    mktVal: 9.00,
-                    overallGL: -2.25,
-                    dayGL: 0.0,
-                  },
-                  {
-                    name: "AVANCE",
-                    quantity: 20,
-                    avgPrice: 0.84,
-                    ltp: 0.63,
-                    invAmt: 16.8,
-                    mktVal: 12.60,
-                    overallGL: -4.20,
-                    dayGL: 0.0,
-                  },
-                  {
-                    name: "SAICOM",
-                    quantity: 4,
-                    avgPrice: 0.43,
-                    ltp: 0.35,
-                    invAmt: 1.72,
-                    mktVal: 1.40,
-                    overallGL: -0.32,
-                    dayGL: 0.0,
-                  },
-                ].map((item, idx) => (
+                {userInvestments?.summary?.map((item, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap font-medium">{item.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">{item.quantity}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">{item.avgPrice}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">{item.ltp}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">{item.invAmt}</td>
+                    <td className="px-6 py-4 whitespace-nowrap font-medium">{item.stockname}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">{item.buyQuantity}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">{item.sellQuantity}</td>
+                    
+                    <td className="px-6 py-4 whitespace-nowrap text-right">{item.totalInvested}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">{item.mktVal}</td>
                     <td className={`px-6 py-4 whitespace-nowrap text-right font-medium ${item.overallGL < 0 ? "text-red-500" : "text-emerald-500"
                       }`}>
@@ -450,9 +451,8 @@ const Dashboard = () => {
               {modalType === 'buy' ? 'Buy' : 'Sell'} {selectedStock?.name}
             </h3>
             
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(BuySellStocks)}>
               <div className="space-y-4">
-                {/* Current Price */}
                 <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg flex justify-between">
                   <span className="text-slate-500 dark:text-slate-400">Current Price</span>
                   <span className="font-medium">{selectedStock?.price}</span>

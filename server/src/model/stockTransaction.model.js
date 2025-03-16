@@ -27,6 +27,10 @@ const stockTransactionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  totalAmount: {
+    type: String,
+    required: true,
+  },
   transactionDate: {
     type: Date,
     default: Date.now,
