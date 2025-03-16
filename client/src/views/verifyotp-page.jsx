@@ -26,7 +26,7 @@ const VerifyOtp = () => {
         throw new ApiError(500, "Email Verification Failed");
       }
       console.log("Email Verified");
-      navigate("/dashboard");
+      navigate("/signin");
     } catch (error) {
       console.log(error)
     }

@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { Link } from "react-router";
 import Button from "./Button";
-import { UserLogOut } from "../../Store/userSlice";
+import { GetCurrentUser, UserLogOut } from "../../Store/userSlice";
 
 function Header() {
   const loginStatus = useSelector((state) => state.user.status);
@@ -31,6 +31,11 @@ function Header() {
       document.documentElement.classList.remove("dark");
     }
   }, []);
+  useEffect(() => {
+    if (UserData?.data?.amount === undefined) {
+      dispatch(GetCurrentUser()).unwrap();
+    }
+  }, []);
 
   const navitems = [
     {
@@ -48,6 +53,7 @@ function Header() {
     {
       name: UserData?.user?.amount,
       Status: loginStatus,
+      path: "/dashboard",
       icon: <IndianRupee className="h-6 w-6 text-white dark:text-black" />,
     },
   ];

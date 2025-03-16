@@ -249,21 +249,21 @@ const Dashboard = () => {
                 Invested Amount
               </div>
               <div className="text-xl font-semibold mt-1">
-                ₹{userInvestments?.monthlyData[0]?.totalInvested}
+                ₹{userInvestments?.monthlyData[0]?.totalInvested || 0.00}
               </div>
             </div>
             <div className="p-5 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-center transition-all hover:shadow-md">
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 Current Value
               </div>
-              <div className="text-xl font-semibold mt-1">₹23.00</div>
+              <div className="text-xl font-semibold mt-1">₹0.00</div>
             </div>
             <div className="p-5 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-center transition-all hover:shadow-md">
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 Overall Loss
               </div>
               <div className="text-xl font-semibold text-red-500 mt-1">
-                ₹6.77
+                ₹0.00
               </div>
               <div className="text-sm text-red-500">-23.34%</div>
             </div>
