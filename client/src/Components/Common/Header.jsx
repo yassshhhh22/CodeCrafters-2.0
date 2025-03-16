@@ -40,7 +40,7 @@ function Header() {
       icon: <LogOutIcon className="h-6 w-6 text-white dark:text-black" />, 
     },
     {
-      name: UserData?.user.amount,
+      name: UserData?.data?.amount,
       Status: loginStatus,
       icon: <IndianRupee className="h-6 w-6 text-white dark:text-black" />
     }

@@ -30,7 +30,7 @@ function App() {
         if (!UserData) {
             fetchCurrentUser();
         }
-    }, []);
+    }, [UserData, fetchCurrentUser]);
 
   return (
     <>
