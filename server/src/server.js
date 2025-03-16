@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { router as ApiRouter } from "./route/api.routes.js";
 import userInvestmentRouter from "./route/userInvestment.routes.js";
 import stockTransactionRouter from "./route/stockTransaction.routes.js";
+import equityRouter from "./route/equity.routes.js";
 
 const app = express();
 
@@ -23,7 +24,7 @@ app.use(cookieParser());
 
 import healthcheckRouter from "./route/healthcheck.routes.js";
 import userRouter from "./route/user.routes.js";
-
+app.use('/v1/api/equity-portfolio', equityRouter);
 app.use("/v1/healthcheck", healthcheckRouter);
 app.use("/v1/users", userRouter);
 app.use("/v1/api", ApiRouter);

@@ -3,7 +3,13 @@ import { AxiosInstance } from '../Utils/AxiosInstance';
 import { ApiError } from '../../../server/src/utils/apiError';
 import { Loader, Triangle } from 'lucide-react';
 import { BuyStocks } from '../Functions/BuyStocks';
+import EquityDashboard from './EquityDashboard'; // Import the new component
 import { Search, Plus, PieChart, BarChart3, TrendingUp, Newspaper ,X} from 'lucide-react';
+
+
+
+// Call the function
+fetchPortfolioData();
 const Dashboard = () => {
   const [stocks, setStocks] = useState([]);
   const [error, setError] = useState(null);
@@ -16,7 +22,17 @@ const Dashboard = () => {
   const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
-  
+  const [activeTab, setActiveTab] = useState('overview');
+  const fetchPortfolioData = async () => {
+    try {
+      const response = await AxiosInstance.get('/v1/api/equity-portfolio');
+      console.log('Portfolio data:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching portfolio data:', error);
+      return null;
+    }
+  };
   const fetchStocks = async () => {
     try {
       setLoading(true);
@@ -62,7 +78,6 @@ const Dashboard = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would handle the actual buy/sell operation
     console.log(`${modalType.toUpperCase()} Order:`, {
       stock: selectedStock.name,
       quantity,
@@ -71,19 +86,15 @@ const Dashboard = () => {
       type: modalType
     });
     
-    // Close modal after submission
     handleCloseModal();
     
-    // Show feedback to user (you could add a toast notification here)
     alert(`${modalType.charAt(0).toUpperCase() + modalType.slice(1)} order placed successfully!`);
   }
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col transition-colors duration-200">
 
-    {/* Main layout with sidebar and content */}
     <div className="flex flex-1">
-      {/* Sidebar */}
       <aside className="w-1/4 lg:w-1/5 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 overflow-y-auto h-[calc(100vh-57px)]">
         <div className="p-4">
           <div className="relative">
@@ -140,20 +151,28 @@ const Dashboard = () => {
         )}
       </aside>
 
-      {/* Main content area */}
       <main className="flex-1 p-6 overflow-y-auto bg-slate-50 dark:bg-slate-800">
         {/* Tabs */}
         <div className="flex space-x-8 border-b border-slate-200 dark:border-slate-700 mb-6">
-          <button className="pb-3 border-b-2 border-emerald-500 text-emerald-600 dark:text-emerald-500 font-semibold">
-            Overview
-          </button>
-          <button className="pb-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
-            Equity
-          </button>
-          <button className="pb-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
-            Bonds
-          </button>
-        </div>
+            <button 
+              className={`pb-3 ${activeTab === 'overview' ? 'border-b-2 border-emerald-500 text-emerald-600 dark:text-emerald-500 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors'}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              Overview
+            </button>
+            <button 
+              className={`pb-3 ${activeTab === 'equity' ? 'border-b-2 border-emerald-500 text-emerald-600 dark:text-emerald-500 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors'}`}
+              onClick={() => setActiveTab('equity')}
+            >
+              Equity
+            </button>
+            <button 
+              className={`pb-3 ${activeTab === 'bonds' ? 'border-b-2 border-emerald-500 text-emerald-600 dark:text-emerald-500 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors'}`}
+              onClick={() => setActiveTab('bonds')}
+            >
+              Bonds
+            </button>
+          </div>
 
         {/* Top cards: Invested Amount, Current Value, etc. */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -404,6 +423,14 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+          {activeTab === 'equity' && <EquityDashboard />}
+          
+          {activeTab === 'bonds' && (
+            <div className="text-center p-10">
+              <h2 className="text-xl font-semibold mb-4">Bonds Dashboard</h2>
+              <p>Bonds dashboard is coming soon.</p>
+            </div>
+          )}
         </main>
       </div>
 
