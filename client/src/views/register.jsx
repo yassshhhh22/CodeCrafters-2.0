@@ -28,7 +28,7 @@ const Register = () => {
     }
   };
 
-  if (userData.data?.email) {
+  if (userData?.data?.email) {
     navigate("/dashboard");
   }
   return (
